@@ -9,18 +9,35 @@
 				<Page title="{i18n>peoplePageTitle}">
 					<content>
 						<Table
-							id="productList" items="{/Product}"
-							>
-
+							id="productList"
+							growing="true"
+							growingThreshold="10"
+							items="{
+								path: '/Product'
+							}">
 							<headerToolbar>
 								<OverflowToolbar>
 									<content>
 										<ToolbarSpacer/>
-										
-										</content>
+
+										<Button
+											id="addUserButton"
+											icon="sap-icon://add"
+											tooltip="{i18n>createButtonText}"
+											press=".onCreate">
+											<layoutData>
+												<OverflowToolbarLayoutData priority="NeverOverflow"/>
+											</layoutData>
+										</Button>
+
+										<Button
+											id="refreshUsersButton"
+											icon="sap-icon://refresh"
+											tooltip="{i18n>refreshButtonText}"
+											press=".onRefresh"/>
+									</content>
 								</OverflowToolbar>
 							</headerToolbar>
-							
 							<columns>
 								<Column id="userNameColumn">
 									<Text text="product ID"/>
