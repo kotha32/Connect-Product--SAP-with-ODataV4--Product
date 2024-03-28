@@ -34,28 +34,34 @@ sap.ui.define([
 			oMessageModelBinding.attachChange(this.onMessageBindingChange, this);
 			this._bTechnicalErrors = false;
 },
-onCreate : function () {
-	var oList = this.byId("productList"),
-		oBinding = oList.getBinding("items"),
-		oContext = oBinding.create({
-			"product_id" : "",
-			"product_name" : "",
-			"product_img" : "",
-			"product_cost" : 200,
-			"product_sell" : 100
-		});
+onCreate: function () {
+    var oList = this.byId("productList"),
+        oBinding = oList.getBinding("items"),
+        oContext = oBinding.create({
+            "product_id": "",
+            "product_name": "",
+            "product_img": "",
+            "product_cost": 200,
+            "product_sell": 100
+        });
 
-	this._setUIChanges();
-	this.getView().getModel("appView").setProperty("/usernameEmpty", true);
+    this._setUIChanges();
+    this.getView().getModel("appView").setProperty("/usernameEmpty", true);
 
-	oList.getItems().some(function (oItem) {
-		if (oItem.getBindingContext() === oContext) {
-			oItem.focus();
-			oItem.setSelected(true);
-			return true;
-		}
-	});
+    // Remove the "Add" button from the toolbar when creating new data
+    var addButton = this.getView().byId("addUserButton");
+    var toolbar = this.getView().byId("headerToolbar");
+    toolbar.removeContent(addButton);
+
+    oList.getItems().some(function (oItem) {
+        if (oItem.getBindingContext() === oContext) {
+            oItem.focus();
+            oItem.setSelected(true);
+            return true;
+        }
+    });
 },
+
 onDelete : function () {
 	var oContext,
 		oSelected = this.byId("productList").getSelectedItem(),
@@ -111,23 +117,29 @@ onInputChange : function (oEvt) {
 			this._bTechnicalErrors = false; 
 			this._setUIChanges();
 		},
-		onSave : function () {
+		onSave: function () {
 			var fnSuccess = function () {
 				this._setBusy(false);
 				MessageToast.show(this._getText("changesSentMessage"));
 				this._setUIChanges(false);
+		
+				// Move the "Add" button back to its original position
+				var addButton = this.getView().byId("addUserButton"); // Retrieve the "Add" button
+				var toolbar = this.getView().byId("headerToolbar"); // Retrieve the toolbar
+				toolbar.addContent(addButton); // Add the "Add" button back to the toolbar
 			}.bind(this);
-
+		
 			var fnError = function (oError) {
 				this._setBusy(false);
 				this._setUIChanges(false);
 				MessageBox.error(oError.message);
 			}.bind(this);
-
+		
 			this._setBusy(true); // Lock UI until submitBatch is resolved.
 			this.getView().getModel().submitBatch("productGroup").then(fnSuccess, fnError);
 			this._bTechnicalErrors = false; // If there were technical errors, a new save resets them.
 		},
+				
 		onMessageBindingChange : function (oEvent) {
 			var aContexts = oEvent.getSource().getContexts(),
 				aMessages,
